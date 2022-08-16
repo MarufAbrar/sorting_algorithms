@@ -1,73 +1,61 @@
 #include "sort.h"
 
 /**
- * quick_sort - function that sorts an array of integers
- *              in ascending order using the Quick sort algorithm
- * @array: array
- * @size: array's size
- * Return: void
+ * swapme - swap the nodes themselves.
+ * @current: pointer.
+ * @current_old: pointer.
+ * @list: doubly linked list
  */
-void quick_sort(int *array, size_t size)
+void swapme(listint_t *current, listint_t *current_old, listint_t **list)
 {
-	if (array == NULL || size < 2)
+	listint_t *temp1 = current->next;
+	listint_t *temp2 = current_old->prev;
+
+	if (temp1 != NULL)
+		temp1->prev = current_old;
+	if (temp2 != NULL)
+		temp2->next = current;
+	current->prev = temp2;
+	current_old->next = temp1;
+	current->next = current_old;
+	current_old->prev = current;
+	if (*list == current_old)
+		*list = current;
+	print_list(*list);
+}
+
+/**
+ * cocktail_sort_list - cocktail_sort_list
+ *
+ * @list: doubly linked list
+ */
+void cocktail_sort_list(listint_t **list)
+{
+	listint_t *check = *list, *first = NULL, *last = NULL;
+
+	if (!list)
 		return;
-
-	quick_s(array, 0, size - 1, size);
-}
-
-/**
- * partition - partition
- * @array: array
- * @lo: lower
- * @hi: higher
- * @size: array's size
- * Return: i
- */
-int partition(int *array, int lo, int hi, size_t size)
-{
-	int i = lo - 1, j = lo;
-	int pivot = array[hi], aux = 0;
-
-	for (; j < hi; j++)
-	{
-		if (array[j] < pivot)
+	if (!(*list))
+		return;
+	if (!(*list)->next)
+		return;
+	do {
+		while (check->next)
 		{
-			i++;
-			if (array[i] != array[j])
-			{
-				aux = array[i];
-				array[i] = array[j];
-				array[j] = aux;
-				print_array(array, size);
-			}
+			if (check->n > check->next->n)
+				swapme(check->next, check, list);
+			else
+				check = check->next;
 		}
-	}
-	if (array[i + 1] != array[hi])
-	{
-		aux = array[i + 1];
-		array[i + 1] = array[hi];
-		array[hi] = aux;
-		print_array(array, size);
-	}
-	return (i + 1);
+		last = check;
+		while (check->prev != first)
+		{
+			if (check->n < check->prev->n)
+				swapme(check, check->prev, list);
+			else
+				check = check->prev;
+		}
+		first = check;
+	} while (first != last);
 }
 
-/**
- * quick_s - quick sort
- * @array: given array
- * @lo: lower
- * @hi:higher
- * @size: array's size
- * Return: void
- */
-void quick_s(int *array, int lo, int hi, size_t size)
-{
-	int pivot;
-
-	if (lo < hi)
-	{
-		pivot = partition(array, lo, hi, size);
-		quick_s(array, lo, pivot - 1, size);
-		quick_s(array, pivot + 1, hi, size);
-	}
-}
